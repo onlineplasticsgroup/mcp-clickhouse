@@ -1,0 +1,1 @@
+image = "k3d-opg-local-registry:5000/mcp-clickhouse"
