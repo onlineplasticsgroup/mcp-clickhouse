@@ -19,8 +19,17 @@ An MCP server for ClickHouse.
   * List all databases on your ClickHouse cluster.
 
 * `list_tables`
-  * List all tables in a database.
-  * Input: `database` (string): The name of the database.
+  * List tables in a database with pagination.
+  * Required input: `database` (string).
+  * Optional inputs:
+    * `like` / `not_like` (string): Apply `LIKE` or `NOT LIKE` filters to table names.
+    * `page_token` (string): Token returned by a previous call for fetching the next page.
+    * `page_size` (int, default `50`): Number of tables returned per page.
+    * `include_detailed_columns` (bool, default `true`): When `false`, omits column metadata for lighter responses while keeping the full `create_table_query`.
+  * Response shape:
+    * `tables`: Array of table objects for the current page.
+    * `next_page_token`: Pass this value back to fetch the next page, or `null` when there are no more tables.
+    * `total_tables`: Total count of tables that match the supplied filters.
 
 ### chDB Tools
 
@@ -69,6 +78,7 @@ This MCP server supports both ClickHouse and chDB. You can enable either or both
         "CLICKHOUSE_PORT": "<clickhouse-port>",
         "CLICKHOUSE_USER": "<clickhouse-user>",
         "CLICKHOUSE_PASSWORD": "<clickhouse-password>",
+        "CLICKHOUSE_ROLE": "<clickhouse-role>",
         "CLICKHOUSE_SECURE": "true",
         "CLICKHOUSE_VERIFY": "true",
         "CLICKHOUSE_CONNECT_TIMEOUT": "30",
@@ -289,6 +299,9 @@ The following environment variables are used to configure the ClickHouse and chD
 * `CLICKHOUSE_PORT`: The port number of your ClickHouse server
   * Default: `8443` if HTTPS is enabled, `8123` if disabled
   * Usually doesn't need to be set unless using a non-standard port
+* `CLICKHOUSE_ROLE`: The role to use for authentication
+  * Default: None
+  * Set this if your user requires a specific role
 * `CLICKHOUSE_SECURE`: Enable/disable HTTPS connection
   * Default: `"true"`
   * Set to `"false"` for non-secure connections
